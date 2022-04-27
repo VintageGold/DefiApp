@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 from data.load import get_data,get_model
-from esemble_sklearn import SklearnEnsemble
+from ensemble_sklearn import SklearnEnsemble
 from plotting import cummulative_interest,borrowing_rates
 
 # set variables in session state
