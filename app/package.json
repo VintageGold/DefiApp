@@ -1,7 +1,7 @@
 {
   "name": "my-package",
   "scripts": {
-    "build": "babel src -d lib",
+    "build": "streamlit run",
     "test": "app.py"
   }
 }
