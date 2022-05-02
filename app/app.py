@@ -33,10 +33,9 @@ def main():
     sidebar = st.sidebar
 
     st.write("""
-    Use the CIDs below to compare Models at NTP 5 days and 7 days TW. \n
     Stable Tokens: DAI, USDC, USDT \n
-    Strategy: Predict Token with lowest mean borrowing rate over TW
-
+    Strategy: Predict Token with lowest mean borrowing rate over TW \n
+    Use the CIDs below to compare Models at NTP 5 days and 7 days TW: \n
     """)
     st.write((
             "bafkreifiadt2yrvutdehggmbs44go5zwznbhgz3h5tqixc7m4lw3qinrxa",
