@@ -32,6 +32,23 @@ def main():
     chart1,chart2,chart3= st.columns((2,2,2))
     sidebar = st.sidebar
 
+    st.write("""
+    Use the CIDs below to compare Models at NTP 5 days and 7 days TW. \n
+    Stable Tokens: DAI, USDC, USDT \n
+    Strategy: Predict Token with lowest mean borrowing rate over TW
+
+    """)
+    st.write((
+            "bafkreifiadt2yrvutdehggmbs44go5zwznbhgz3h5tqixc7m4lw3qinrxa",
+            "bafkreih4xcizggjqyocg5g5mzqkflalpymuprbfsowj2j7uyvvsmjx535q",
+            "bafkreifujjs4zark5oyuvfgyobjcnym4ftvjosvlgc2vu73f6n25ky72xe",
+            "bafkreibzrxyzz6koxy2jrdbhpnwctdyrjttgkjbbhshmdjopcbbrfnmovu",
+            "bafkreia4m7wo5kbjsy6qe2jlnouayh3ayzb32lvyrckrlcfzhlydchmwwa",
+            "bafkreihjukozyctyfstuqzlphmpllwjiiotbs2gpitswtiee646xwwigry",
+            "bafkreid2s7gdmch6m7qhewazbn6bv5m4qulw6lohelkz42uobtdgsuppxu",
+
+            ))
+
     with sidebar:
         title = st.title(f'DeepDefi Borrowing Rate Prediction')
         st.write(f"Number of Timepoints: {st.session_state.ntp}")
@@ -65,8 +82,8 @@ def main():
 
     # with chart1.expander("Predictive Model 1",expanded=True):
 
-        chart1_model_cid_tb =  st.text_input("Enter Model IPFS CID", key="model_cid_chart3",
-                                    value="bafkreihc4forokyq77titykzyjmkjbdvhaptja633f4pipp3fjabr46oqa",
+        chart1_model_cid_tb =  st.text_input("Enter Model 1 IPFS CID", key="model_cid_chart3",
+                                    value="bafkreih4xcizggjqyocg5g5mzqkflalpymuprbfsowj2j7uyvvsmjx535q",
                                     )
         chart1_model = get_model(chart1_model_cid_tb)
         st.write(chart1_model)
@@ -78,8 +95,8 @@ def main():
 
     # with chart2.expander("Predictive Model 2",expanded=True):
 
-        chart2_model_cid_tb =  st.text_input("Enter Model IPFS CID", key="model_cid_chart4",
-                                    value="bafkreihc4forokyq77titykzyjmkjbdvhaptja633f4pipp3fjabr46oqa",
+        chart2_model_cid_tb =  st.text_input("Enter Model 2 IPFS CID", key="model_cid_chart4",
+                                    value="bafkreifiadt2yrvutdehggmbs44go5zwznbhgz3h5tqixc7m4lw3qinrxa",
                                     )
         chart2_model = get_model(chart2_model_cid_tb)
         st.write(chart2_model)
@@ -90,41 +107,17 @@ def main():
                 )
 
     df_complete = pd.merge(chart1_pred_cost,chart2_pred_cost[["Date","Classification","M2_br_cost"]],on="Date")
-    # assign colors to type using a dictionary
-    # colors = {'DAI_br_cost':'gold',
-    #           'USDT_br_cost':'green',
-    #           'USDC_br_cost':'blue',
-    #           }
+
+    df_complete["Classification_x"] = df_complete["Classification_x"].apply(lambda x: " ".join(["M1",x]))
+    df_complete["Classification_y"] = df_complete["Classification_y"].apply(lambda y: " ".join(["M2",y]))
+
+
     fig = cummulative_interest(df_complete,"Date","M1_br_cost",
                         "M2_br_cost","Classification_x","Classification_y")
     st.plotly_chart(fig,use_container_width=True)
 
     fig2 = borrowing_rates(df_complete,"Date","M1_br_cost","M2_br_cost")
-    # # plotly figure
-    # fig1=go.Figure()
-    # for t in complete[colors.keys()]:
-    #     fig1.add_traces(go.Scatter(x=complete['Date'], y=complete[t], name=t,
-    #                          marker_color=colors[t],
-    #                          mode="markers")
-    #                          )
-    #
-    # colors = {'Strategy':"red"
-    #               }
-    # df_temp = complete.copy()
-    # df_temp["color"] = "Strategy"
-    # fig2 = px.line(df_temp,x="Date",y="M1_br_cost",color="color",template="plotly_dark",
-    #                 color_discrete_sequence=['red'])
-    #
-    # fig3 = px.line(df_temp,x="Date",y="M2_br_cost",color="color",template="plotly_dark",
-    #                 color_discrete_sequence=['white'])
-    #
-    # fig = go.Figure(data = fig1.data + fig2.data + fig3.data)
-    # fig.update_layout(
-    # title="Borrowing Rates Overtime",
-    # plot_bgcolor="black"
-    # )
-    # fig.update_xaxes(showgrid=True, gridwidth=1, gridcolor='LightPink',title_text="Date")
-    # fig.update_yaxes(showgrid=True, gridwidth=1, gridcolor='LightPink',title_text="Dollars")
+
     st.plotly_chart(fig2,use_container_width=True)
 
     with sidebar:
