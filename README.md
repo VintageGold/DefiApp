@@ -16,13 +16,14 @@ conda create -n DeepDefiApp -c conda-forge pip
 
 conda activate DeepDefiApp
 
+cd DeepDefiApp
+
 pip install -r requirements.txt
 ```
 
 Run streamlit app
 
 ```
-cd DeepDefiApp
 cd app
 streamlit run app.py
 ```
