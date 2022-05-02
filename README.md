@@ -17,7 +17,6 @@ conda create -n DeepDefiApp -c conda-forge pip
 conda activate DeepDefiApp
 
 pip install -r requirements.txt
-
 ```
 
 Run streamlit app
@@ -26,7 +25,6 @@ Run streamlit app
 cd DeepDefiApp
 cd app
 streamlit run app.py
-
 ```
 
 Disclosure: These models are currently enduring testing, use the insight at your own risk.
