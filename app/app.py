@@ -53,7 +53,7 @@ def main():
         title = st.title(f'Defi Borrowing Rate Prediction')
         st.write(f"Number of Timepoints: {st.session_state.ntp}")
         st.write(f"Time Window: {st.session_state.tw}")
-        initial_amount = st.selectbox("Enter the initial amount",
+        initial_amount = st.selectbox("Enter Loan Amount",
                                     options=initial_amounts,
                                     format_func=format_string)
 
