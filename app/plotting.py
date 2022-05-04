@@ -2,7 +2,7 @@ import plotly.graph_objs as go
 import plotly.express as px
 import plotly.io as pio
 
-def cummulative_interest(df,x,y1,y2,color1,color2):
+def cumulative_interest(df,x,y1,y2,color1,color2):
 
     # assign colors to type using a dictionary
     colors = {'DAI_br_cost':'gold',
@@ -32,7 +32,7 @@ def cummulative_interest(df,x,y1,y2,color1,color2):
 
     fig = go.Figure(data = fig1.data + fig2.data + fig3.data)
     fig.update_layout(
-    title="Cummulative Interest Amount",
+    title="Cumulative Interest Cost",
     plot_bgcolor="black"
     )
     fig.update_xaxes(showgrid=True, gridwidth=1, gridcolor='LightPink',title_text="Date")
