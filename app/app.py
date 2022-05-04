@@ -26,14 +26,14 @@ def predict(initial_amount,model,scaler,le,DF,NTP,TW,only_model=True):
     return preds
 
 def main():
-    st.set_page_config(layout="wide",page_title="DeepDefi - Compound Model")
+    st.set_page_config(layout="wide",page_title="DefiSquad - Compound Model")
     st.image("https://uploads-ssl.webflow.com/61617acfb8ea62c4150005a1/61617ce3dd51f921e58fbd24_logo.svg", width=200)
     initial_amounts = sorted(range(int(10e6),int(10e7)+int(10e6),int(10e6)),reverse=True)
 
     st.write("""
     Stable Tokens: DAI, USDC, USDT \n
     Strategy: Predict Token with lowest mean borrowing rate over TW \n
-    Use the CIDs below to compare Models at NTP 5 days and 7 days TW: \n
+    Use the IPFS CIDs below to compare Models at NTP 5 days and 7 days TW: \n
     """)
     st.write((
             "bafkreifiadt2yrvutdehggmbs44go5zwznbhgz3h5tqixc7m4lw3qinrxa",
@@ -113,7 +113,7 @@ def main():
     df_complete["Classification_y"] = df_complete["Classification_y"].apply(lambda y: " ".join(["M2",y]))
 
 
-    with chart1.expander("Total Interest Expense Cost",expanded=True):
+    with chart1.expander("Total Interest Cost",expanded=True):
         #DataFrame
         df_total_interest = (pd.DataFrame(df_complete.select_dtypes(include="float").sum(),
                             columns=["Interest Owed"]
@@ -126,7 +126,7 @@ def main():
 
         st.dataframe(display_df)
 
-    with chart2.expander(f"Total Interest Percentage, based on ${initial_amount:,.0f}",expanded=True):
+    with chart2.expander(f"Total Interest Cost Percentage, based on ${initial_amount:,.0f}",expanded=True):
 
         df_total_interest["Interest Percentage"] = (df_total_interest["Interest Owed"]/initial_amount)*100
 
