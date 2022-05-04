@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 from data.load import get_data,get_model
 from ensemble_sklearn import SklearnEnsemble
-from plotting import cummulative_interest,borrowing_rates
+from plotting import cumulative_interest,borrowing_rates
 
 # set variables in session state
 st.session_state.ntp = 5
@@ -28,9 +28,7 @@ def predict(initial_amount,model,scaler,le,DF,NTP,TW,only_model=True):
 def main():
     st.set_page_config(layout="wide",page_title="DeepDefi - Compound Model")
     st.image("https://uploads-ssl.webflow.com/61617acfb8ea62c4150005a1/61617ce3dd51f921e58fbd24_logo.svg", width=200)
-    initial_amounts = sorted(range(50000,1050000,50000),reverse=True)
-    chart1,chart2,chart3= st.columns((2,2,2))
-    sidebar = st.sidebar
+    initial_amounts = sorted(range(int(10e6),int(10e7)+int(10e6),int(10e6)),reverse=True)
 
     st.write("""
     Stable Tokens: DAI, USDC, USDT \n
@@ -48,8 +46,11 @@ def main():
 
             ))
 
+    chart1,chart2,chart3= st.columns((2,2,2))
+    sidebar = st.sidebar
+
     with sidebar:
-        title = st.title(f'DeepDefi Borrowing Rate Prediction')
+        title = st.title(f'Defi Borrowing Rate Prediction')
         st.write(f"Number of Timepoints: {st.session_state.ntp}")
         st.write(f"Time Window: {st.session_state.tw}")
         initial_amount = st.selectbox("Enter the initial amount",
@@ -105,38 +106,64 @@ def main():
                 only_model=True
                 )
 
+    #Line Plot
     df_complete = pd.merge(chart1_pred_cost,chart2_pred_cost[["Date","Classification","M2_br_cost"]],on="Date")
 
     df_complete["Classification_x"] = df_complete["Classification_x"].apply(lambda x: " ".join(["M1",x]))
     df_complete["Classification_y"] = df_complete["Classification_y"].apply(lambda y: " ".join(["M2",y]))
 
 
-    fig = cummulative_interest(df_complete,"Date","M1_br_cost",
-                        "M2_br_cost","Classification_x","Classification_y")
-    st.plotly_chart(fig,use_container_width=True)
-
-    fig2 = borrowing_rates(df_complete,"Date","M1_br_cost","M2_br_cost")
-
-    st.plotly_chart(fig2,use_container_width=True)
-
-    with sidebar:
-        st.header("Tables")
-
-        st.write("Total Interest")
+    with chart1.expander("Total Interest Expense Cost",expanded=True):
+        #DataFrame
         df_total_interest = (pd.DataFrame(df_complete.select_dtypes(include="float").sum(),
                             columns=["Interest Owed"]
                             )
                             .sort_values("Interest Owed",ascending=False)
                             )
+
+
         display_df = df_total_interest.style.format("${:,.0f}").highlight_min(color='green')
 
         st.dataframe(display_df)
 
-        st.write("Cummulative Interest Rates")
-        st.dataframe(df_complete.select_dtypes(include="float").cumsum().style.format("${:,.0f}"))
+    with chart2.expander(f"Total Interest Percentage, based on ${initial_amount:,.0f}",expanded=True):
 
-        st.write("Interest Rates")
-        st.dataframe(df_complete)
+        df_total_interest["Interest Percentage"] = (df_total_interest["Interest Owed"]/initial_amount)*100
+
+        display_df = df_total_interest[["Interest Percentage"]].style.format("{:,.2f}%").highlight_min(color='green')
+
+        st.dataframe(display_df)
+
+    fig = cumulative_interest(df_complete,"Date","M1_br_cost",
+                        "M2_br_cost","Classification_x","Classification_y")
+
+    st.plotly_chart(fig,use_container_width=True)
+
+
+
+    #Line Plot
+    # fig2 = borrowing_rates(df_complete,"Date","M1_br_cost","M2_br_cost")
+    #
+    # st.plotly_chart(fig2,use_container_width=True)
+    #
+    # with sidebar:
+    #     st.header("Tables")
+    #
+    #     st.write("Total Interest Expense Savings")
+    #     df_total_interest = (pd.DataFrame(df_complete.select_dtypes(include="float").sum(),
+    #                         columns=["Interest Owed"]
+    #                         )
+    #                         .sort_values("Interest Owed",ascending=False)
+    #                         )
+    #     display_df = df_total_interest.style.format("${:,.0f}").highlight_min(color='green')
+    #
+    #     st.dataframe(display_df)
+    #
+    #     st.write("Cummulative Interest Rates")
+    #     st.dataframe(df_complete.select_dtypes(include="float").cumsum().style.format("${:,.0f}"))
+    #
+    #     st.write("Interest Rates")
+    #     st.dataframe(df_complete)
 
 if __name__ == "__main__":
     main()
