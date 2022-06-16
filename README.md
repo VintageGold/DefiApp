@@ -1,5 +1,7 @@
 # DeepDefiApp - Pre Alpha
 
+<img src="img/index.png" width="150">
+
 Web App Compare Models
 
 Clone Repository
