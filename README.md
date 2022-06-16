@@ -1,6 +1,6 @@
 # DeepDefiApp - Pre Alpha
 
-<img src="img/index.png" width="150">
+<img src="img/index.png" width="1000">
 
 Web App Compare Models
 
