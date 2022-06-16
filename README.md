@@ -2,7 +2,7 @@
 
 <img src="img/index.png" width="1000">
 
-Web App Compare Models
+This web app is used to compare models for DeFi borrowing interest prediction
 
 Clone Repository
 
