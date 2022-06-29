@@ -1,6 +1,6 @@
 # DeepDefiApp - Pre Alpha
 
-<img src="img/index.png" width="1000">
+<img src="img/UI.png" width="1000">
 
 This web app is used to compare models for DeFi borrowing interest prediction
 
