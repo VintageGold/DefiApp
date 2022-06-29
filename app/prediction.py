@@ -47,12 +47,14 @@ def prediction(
         precision_score(y,pred,average="micro"),
         recall_score(y,pred,average="micro"))
 
-
+#dollar impact
+def lowest_cost(row):
+    return row[row.Lowest_br_cost] * row['Borrow Amount']/365
 #dollar impact
 def strategy_cost(row):
     return row[row.Predict] * row['Borrow Amount']/365
 
-def compare_strategy(ntp, tw, initial_borrow, df,ss,le,clf,filter_cols):
+def compare_strategy(ntp, tw, initial_borrow, df,y,ss,le,clf,filter_cols):
 
     chunks = []
     for i, v in enumerate(range(0, len(df), tw)):
@@ -88,16 +90,16 @@ def compare_strategy(ntp, tw, initial_borrow, df,ss,le,clf,filter_cols):
                       'USDC_borrowRate_t-0':'USDC_borrowRate',
                       'USDT_borrowRate_t-0':'USDT_borrowRate'})
 )
-
+    final['Lowest_br_cost'] = y
     final['Borrow Amount'] = initial_borrow
-
     final['DAI_br_cost'] = final['DAI_borrowRate'] * final['Borrow Amount']/365
     final['USDC_br_cost'] = final['USDC_borrowRate'] * final['Borrow Amount']/365
     final['USDT_br_cost'] = final['USDT_borrowRate'] * final['Borrow Amount']/365
 
 
     final['Strategy_br_cost'] = final.apply(lambda row: strategy_cost(row), axis=1)
+    final['Lowest_br_cost'] = final.apply(lambda row: lowest_cost(row), axis=1)
 
-    return (final[['Borrow Amount','DAI_br_cost','USDC_br_cost','USDT_br_cost','Strategy_br_cost']],
+    return (final[['Borrow Amount','DAI_br_cost','USDC_br_cost','USDT_br_cost','Strategy_br_cost','Lowest_br_cost']],
             len(chunks)
             )
