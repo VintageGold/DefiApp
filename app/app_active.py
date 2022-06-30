@@ -8,8 +8,6 @@ import helpers.helper as hh
 # set variables in session state
 st.session_state.ntp = 5
 
-#.cumsum()
-
 def get_success(msg):
     return st.success(msg)
 
@@ -36,17 +34,23 @@ def br_cost_ds(date,model,model_cid,accuracy,borrowing_cost,pred):
 
     return temp_df
 
+def ui_cols(size1,size2):
+
+    return st.columns((size1,size1))
+
 def main():
     st.set_page_config(layout="wide",page_title="DefiSquad - Compound Model")
     st.image("https://uploads-ssl.webflow.com/61617acfb8ea62c4150005a1/61617ce3dd51f921e58fbd24_logo.svg", width=200)
     st.image("https://cryptologos.cc/logos/compound-comp-logo.svg?v=022",width=100)
-    initial_amounts = sorted(range(int(10e6),int(10e7)+int(10e6),int(10e6)),reverse=True)
     title = st.title(f'Defi Borrowing Rate Saver :sunglasses: :fire:')
     st.write("https://defi.instadapp.io/compound")
-    chart1,chart2= st.columns((2,2))
+    st.write("https://dune.com/datanut/Compound-Maker-and-Aave-Deposits-Loans-LTV")
+
+    chart1,chart2= ui_cols(2,2)
 
     with chart1.expander("Interest Cost",expanded=True):
 
+        initial_amounts = sorted(range(int(10e6),int(10e7)+int(10e6),int(10e6)),reverse=True)
         initial_amount = st.selectbox("Enter Loan Amount",
                                     options=initial_amounts,
                                     format_func=format_string)
@@ -54,38 +58,43 @@ def main():
         tw = st.selectbox("Time Window (Days)",options=[7,14,21])
 
         st.write("Model Loaded Progress")
-
         my_bar = st.progress(0)
-        i = 0
+        progress_amount = 0
 
     dollar_results_df = pd.DataFrame()
 
     #Get Data
     response,log = hh.get_ipfs("bafkreidnuulqq7cysvb35agjrn2st3nmhprjvp4eooew6z5xqyyigefav4")
 
-    dataset = hh.read_file(response.content)
+    df_historical = hh.read_file(response.content)
+
+    df_realtime = pd.read_csv("../data/compoundV2.csv")
+
+    dataset = pd.concat([df_historical,df_realtime],axis=0).sort_values("Date",ascending=True)
 
     df_predict,y = hh.get_tabpandas_multi(dataset.drop(columns=["Date"]),st.session_state.ntp,tw)
 
-    load_ipfs_cids = pd.read_csv(f"models/V1/{st.session_state.ntp}_{tw}_models.csv").iloc[:4]
+    load_ipfs_cids = pd.read_csv(f"models/V99/{st.session_state.ntp}_{tw}_models.csv").iloc[:4]
 
     iter_ipfs_cids = (load_ipfs_cids[["ipfs_pin_hash","keyvalues_scalerLabelEncoder",
                         "keyvalues_datasetTraining"]]
                         .to_numpy().tolist()
     )
 
-    metadata = [tuple(r) for r in iter_ipfs_cids]
+    construct_models = [tuple(r) for r in iter_ipfs_cids]
 
-    for model_cid, ssle_cid, ds_features in metadata:
+    for model_cid, ssle_cid, ds_features in construct_models:
         #Get Models
         clf = hh.get_model(model_cid)
         ss = hh.get_model(eval(ssle_cid)["ss"])
         le = hh.get_model(eval(ssle_cid)["le"])
         fc = eval(ds_features)["filter_cols"]
 
-        i += int(100 / len(metadata))
+        #update this to always equal 100 and not be under or hover_data
+        #good for right now though
+        progress_amount += int(100 / len(construct_models))
 
-        my_bar.progress(i)
+        my_bar.progress(progress_amount)
 
         pred,acc,f1,precision,recall = prediction(clf,ss,le,df_predict,y,fc)
 
@@ -127,11 +136,11 @@ def main():
 
     dollar_results_df_cmlt_plot = pd.merge(dollar_results_df,cummulative_df_formatted,on=["Date","Strategy"])
 
-    fig = (px.area(dollar_results_df_cmlt_plot,x="Date",y="Cumulative Borrow Cost",
-            color="Predictions",facet_col="Strategy",facet_col_wrap=4,hover_data = ["Model_cid","Borrowing Cost","Accuracy"],
+    fig = (px.scatter(dollar_results_df_cmlt_plot,x="Date",y="Cumulative Borrow Cost",
+            color="Predictions",facet_col="Strategy",facet_col_wrap=4,hover_data = ["Borrowing Cost","Accuracy","Model_cid"],
             title="Interest Payments",color_discrete_map=d_colors)
 )
-
+    fig.for_each_annotation(lambda a: a.update(text=a.text.split("=",1)[1]))
     fig.update_layout(margin=dict(t=40),yaxis_title="Cummulative Borrowing Cost")
     fig.update_xaxes(showgrid=False)
 
@@ -163,9 +172,11 @@ def main():
 
     with chart2.expander("Parameters",expanded=True):
         st.dataframe(display_df)
-    st.metric("Compund Borrow Position","Place Holder - USDC")
     st.title("Historical Performance")
+    current_prediction = pred[-1].split("_")[0]
+    st.metric("Compund Borrow Position",f"Best Model Chooses - {current_prediction} ")
     st.plotly_chart(fig,use_container_width=True)
+    st.dataframe(dataset)
 
     title = st.title('Model Description')
     st.write("""

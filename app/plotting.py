@@ -20,7 +20,7 @@ def cumulative_interest(df,x,y1,y2,color1,color2):
 
     M1_cs = df[y1].cumsum()
 
-    fig2 = px.scatter(df,x=x,y=M1_cs,color=color1,template="plotly_dark")
+    fig2 = px.line(df,x=x,y=M1_cs,color=color1,template="plotly_dark")
 
     # st.plotly_chart(fig,use_container_width=True)
 

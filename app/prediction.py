@@ -82,7 +82,7 @@ def compare_strategy(ntp, tw, initial_borrow, df,y,ss,le,clf,filter_cols):
             if i == 0:
                 final = chu.dropna()
             else:
-                final = final.append(chu.dropna()).reset_index(drop=True)
+                final = pd.concat([final,chu.dropna()]).reset_index(drop=True)
 
 
     final = (final[['DAI_borrowRate_t-0','USDC_borrowRate_t-0','USDT_borrowRate_t-0','Predict']]
