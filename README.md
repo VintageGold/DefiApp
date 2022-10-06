@@ -30,5 +30,5 @@ cd app
 streamlit run app.py
 ```
 
-Disclosure: These models are currently enduring testing, use the insight at your own risk.
+Disclaimer: These models are currently enduring testing, use the insight at your own risk.
 
